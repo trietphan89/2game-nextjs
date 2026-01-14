@@ -1,0 +1,584 @@
+// This is your Prisma schema file for 2GAME.VN
+// Complete database schema with all models
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// AUTHENTICATION & USER MANAGEMENT
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  username      String    @unique
+  password      String    // bcrypt hashed
+  displayName   String?
+  avatar        String?
+  bio           String?
+  points        Int       @default(0)
+  level         Int       @default(1)
+  role          UserRole  @default(USER)
+  isVerified    Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  sessions            Session[]
+  wishlist            UserWishlist[]
+  library             UserLibrary[]
+  posts               CommunityPost[]
+  comments            Comment[]
+  likes               Like[]
+  following           Follow[]          @relation("UserFollowing")
+  followers           Follow[]          @relation("UserFollowers")
+  playerRanking       PlayerRanking?
+  guildMemberships    GuildMember[]
+  eventRegistrations  EventRegistration[]
+  rewards             UserReward[]
+  missions            UserMission[]
+  achievements        UserAchievement[]
+  streams             LiveStream[]
+  creatorProfile      CreatorProfile?
+  developerProfile    DeveloperProfile?
+  uploads             Upload[]
+
+  @@index([email])
+  @@index([username])
+}
+
+enum UserRole {
+  USER
+  CREATOR
+  DEVELOPER
+  MODERATOR
+  ADMIN
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+// ============================================
+// GAMES & CATALOG
+// ============================================
+
+model Game {
+  id              String    @id @default(cuid())
+  title           String
+  slug            String    @unique
+  description     String?   @db.Text
+  genre           String[]
+  category        String
+  price           Decimal   @default(0)
+  originalPrice   Decimal?
+  discount        Int       @default(0)
+  rating          Float     @default(0)
+  totalReviews    Int       @default(0)
+  coverImage      String?
+  coverGradient   String?
+  screenshots     String[]
+  videoUrl        String?
+  developer       String?
+  publisher       String?
+  releaseDate     String?
+  platforms       String[]
+  languages       String[]
+  features        String[]
+  systemReqs      Json?
+  isFeatured      Boolean   @default(false)
+  isActive        Boolean   @default(true)
+  totalPlayers    Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  wishlistedBy  UserWishlist[]
+  ownedBy       UserLibrary[]
+  ranking       GameRanking?
+
+  @@index([slug])
+  @@index([category])
+  @@index([isFeatured])
+}
+
+model UserWishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  gameId    String
+  addedAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, gameId])
+  @@index([userId])
+}
+
+model UserLibrary {
+  id            String   @id @default(cuid())
+  userId        String
+  gameId        String
+  acquiredAt    DateTime @default(now())
+  playTime      Int      @default(0) // in minutes
+  lastPlayedAt  DateTime?
+  progress      Int      @default(0) // percentage
+  isFavorite    Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, gameId])
+  @@index([userId])
+}
+
+// ============================================
+// COMMUNITY & SOCIAL
+// ============================================
+
+model CommunityPost {
+  id          String   @id @default(cuid())
+  userId      String
+  content     String   @db.Text
+  images      String[]
+  likesCount  Int      @default(0)
+  commentsCount Int    @default(0)
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments Comment[]
+  likes    Like[]
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  content   String   @db.Text
+  parentId  String?  // for nested comments
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post   CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent Comment?      @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies Comment[]    @relation("CommentReplies")
+
+  @@index([postId])
+  @@index([userId])
+  @@index([parentId])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}
+
+// ============================================
+// RANKINGS & LEADERBOARDS
+// ============================================
+
+model PlayerRanking {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  rank        Int      @unique
+  points      Int      @default(0)
+  gamesPlayed Int      @default(0)
+  achievements Int     @default(0)
+  winRate     Float    @default(0)
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([rank])
+  @@index([points])
+}
+
+model GameRanking {
+  id          String   @id @default(cuid())
+  gameId      String   @unique
+  rank        Int      @unique
+  totalPlayers Int     @default(0)
+  avgRating   Float    @default(0)
+  totalReviews Int     @default(0)
+  trending    Boolean  @default(false)
+  updatedAt   DateTime @updatedAt
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@index([rank])
+  @@index([trending])
+}
+
+// ============================================
+// GUILDS & TEAMS
+// ============================================
+
+model Guild {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?  @db.Text
+  avatar      String?
+  banner      String?
+  leaderId    String
+  memberCount Int      @default(1)
+  level       Int      @default(1)
+  points      Int      @default(0)
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members GuildMember[]
+
+  @@index([slug])
+  @@index([points])
+}
+
+model GuildMember {
+  id        String       @id @default(cuid())
+  guildId   String
+  userId    String
+  role      GuildRole    @default(MEMBER)
+  joinedAt  DateTime     @default(now())
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([guildId, userId])
+  @@index([guildId])
+  @@index([userId])
+}
+
+enum GuildRole {
+  MEMBER
+  OFFICER
+  LEADER
+}
+
+// ============================================
+// EVENTS & TOURNAMENTS
+// ============================================
+
+model Event {
+  id            String      @id @default(cuid())
+  title         String
+  slug          String      @unique
+  description   String?     @db.Text
+  type          EventType
+  banner        String?
+  startDate     DateTime
+  endDate       DateTime
+  maxParticipants Int?
+  currentParticipants Int @default(0)
+  prize         String?
+  rules         String?     @db.Text
+  status        EventStatus @default(UPCOMING)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  registrations EventRegistration[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([startDate])
+}
+
+enum EventType {
+  TOURNAMENT
+  COMMUNITY
+  LAUNCH
+  WORKSHOP
+}
+
+enum EventStatus {
+  UPCOMING
+  LIVE
+  ENDED
+  CANCELLED
+}
+
+model EventRegistration {
+  id        String   @id @default(cuid())
+  eventId   String
+  userId    String
+  teamName  String?
+  status    RegistrationStatus @default(PENDING)
+  registeredAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+}
+
+enum RegistrationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+// ============================================
+// REWARDS & GAMIFICATION
+// ============================================
+
+model Reward {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  icon        String?
+  pointsCost  Int
+  type        RewardType
+  value       String   // JSON string for flexible reward data
+  stock       Int      @default(-1) // -1 = unlimited
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  redeemedBy UserReward[]
+
+  @@index([type])
+  @@index([isActive])
+}
+
+enum RewardType {
+  GAME_DISCOUNT
+  EXCLUSIVE_ITEM
+  AVATAR_FRAME
+  BADGE
+  OTHER
+}
+
+model UserReward {
+  id         String   @id @default(cuid())
+  userId     String
+  rewardId   String
+  redeemedAt DateTime @default(now())
+  usedAt     DateTime?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reward Reward @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([rewardId])
+}
+
+model Mission {
+  id          String      @id @default(cuid())
+  title       String
+  description String?     @db.Text
+  type        MissionType
+  target      Int         // e.g., play 5 games, login 7 days
+  pointsReward Int
+  icon        String?
+  startDate   DateTime?
+  endDate     DateTime?
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+
+  userProgress UserMission[]
+
+  @@index([type])
+  @@index([isActive])
+}
+
+enum MissionType {
+  DAILY
+  WEEKLY
+  MONTHLY
+  SPECIAL
+}
+
+model UserMission {
+  id          String   @id @default(cuid())
+  userId      String
+  missionId   String
+  progress    Int      @default(0)
+  isCompleted Boolean  @default(false)
+  completedAt DateTime?
+  startedAt   DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, missionId])
+  @@index([userId])
+  @@index([missionId])
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  icon        String?
+  badge       String?
+  points      Int      @default(0)
+  rarity      AchievementRarity @default(COMMON)
+  criteria    String   @db.Text // JSON string for unlock criteria
+  isSecret    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  unlockedBy UserAchievement[]
+
+  @@index([rarity])
+}
+
+enum AchievementRarity {
+  COMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@index([achievementId])
+}
+
+// ============================================
+// CONTENT CREATORS & STREAMING (XTV)
+// ============================================
+
+model LiveStream {
+  id          String       @id @default(cuid())
+  userId      String
+  title       String
+  description String?      @db.Text
+  gameId      String?
+  thumbnail   String?
+  streamKey   String       @unique
+  status      StreamStatus @default(OFFLINE)
+  viewerCount Int          @default(0)
+  startedAt   DateTime?
+  endedAt     DateTime?
+  createdAt   DateTime     @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
+
+enum StreamStatus {
+  OFFLINE
+  LIVE
+  ENDED
+}
+
+model CreatorProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  displayName     String
+  bio             String?  @db.Text
+  socialLinks     Json?
+  subscriberCount Int      @default(0)
+  totalViews      Int      @default(0)
+  isVerified      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([subscriberCount])
+}
+
+model DeveloperProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  companyName String
+  website     String?
+  description String?  @db.Text
+  logo        String?
+  isVerified  Boolean  @default(false)
+  gamesPublished Int   @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// FILE UPLOADS
+// ============================================
+
+model Upload {
+  id        String     @id @default(cuid())
+  userId    String
+  filename  String
+  path      String
+  url       String
+  mimeType  String
+  size      Int
+  type      UploadType
+  createdAt DateTime   @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+}
+
+enum UploadType {
+  AVATAR
+  POST_IMAGE
+  GAME_COVER
+  GAME_SCREENSHOT
+  GUILD_AVATAR
+  GUILD_BANNER
+  EVENT_BANNER
+  OTHER
+}

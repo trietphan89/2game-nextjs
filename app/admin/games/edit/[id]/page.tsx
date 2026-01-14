@@ -1,0 +1,555 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
+import { ArrowLeft, Save, X } from 'lucide-react'
+import Link from 'next/link'
+
+interface Game {
+  id: string
+  title: string
+  slug: string
+  description: string
+  shortDescription: string
+  category: string
+  developer: string
+  publisher: string
+  releaseDate: string
+  price: number
+  discount: number
+  thumbnail: string
+  coverImage: string
+  videoUrl?: string
+  systemRequirements: {
+    os: string
+    processor: string
+    memory: string
+    graphics: string
+    storage: string
+  }
+  tags: string[]
+  features: string[]
+  screenshots: string[]
+  isFeatured: boolean
+  status: string
+}
+
+export default function EditGamePage({ params }: { params: { id: string } }) {
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [fetching, setFetching] = useState(true)
+  const [error, setError] = useState('')
+  const [game, setGame] = useState<Game | null>(null)
+
+  useEffect(() => {
+    fetchGame()
+  }, [])
+
+  const fetchGame = async () => {
+    const token = localStorage.getItem('authToken')
+    if (!token) {
+      router.push('/login')
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/admin/games/${params.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setGame(data.data.game)
+      } else {
+        setError('Failed to load game')
+      }
+    } catch (err) {
+      console.error('Fetch game error:', err)
+      setError('An error occurred while loading the game')
+    } finally {
+      setFetching(false)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    const formData = new FormData(e.currentTarget)
+
+    const gameData = {
+      title: formData.get('title') as string,
+      slug: formData.get('slug') as string,
+      description: formData.get('description') as string,
+      shortDescription: formData.get('shortDescription') as string,
+      category: formData.get('category') as string,
+      developer: formData.get('developer') as string,
+      publisher: formData.get('publisher') as string,
+      releaseDate: formData.get('releaseDate') as string,
+      price: parseFloat(formData.get('price') as string),
+      discount: parseInt(formData.get('discount') as string) || 0,
+      thumbnail: formData.get('thumbnail') as string,
+      coverImage: formData.get('coverImage') as string,
+      videoUrl: formData.get('videoUrl') as string || undefined,
+      systemRequirements: {
+        os: formData.get('os') as string,
+        processor: formData.get('processor') as string,
+        memory: formData.get('memory') as string,
+        graphics: formData.get('graphics') as string,
+        storage: formData.get('storage') as string,
+      },
+      tags: (formData.get('tags') as string).split(',').map(tag => tag.trim()).filter(Boolean),
+      features: (formData.get('features') as string).split('\n').map(f => f.trim()).filter(Boolean),
+      screenshots: (formData.get('screenshots') as string).split('\n').map(s => s.trim()).filter(Boolean),
+      isFeatured: formData.get('isFeatured') === 'on',
+      status: formData.get('status') as string,
+    }
+
+    const token = localStorage.getItem('authToken')
+    if (!token) {
+      setError('You must be logged in to edit a game')
+      setLoading(false)
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/admin/games/${params.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(gameData),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        alert('Game updated successfully!')
+        router.push('/admin/games')
+      } else {
+        setError(data.error || 'Failed to update game')
+      }
+    } catch (err) {
+      console.error('Update game error:', err)
+      setError('An error occurred while updating the game')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (fetching) {
+    return (
+      <div className="p-4 lg:p-8 flex items-center justify-center min-h-[60vh]">
+        <div className="text-gray-400">Loading game...</div>
+      </div>
+    )
+  }
+
+  if (error && !game) {
+    return (
+      <div className="p-4 lg:p-8">
+        <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-lg text-red-400">
+          {error}
+        </div>
+        <Link
+          href="/admin/games"
+          className="mt-4 inline-flex items-center gap-2 text-gray-400 hover:text-white"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Games
+        </Link>
+      </div>
+    )
+  }
+
+  if (!game) return null
+
+  return (
+    <div className="p-4 lg:p-8">
+      {/* Header */}
+      <div className="flex items-center gap-4 mb-8">
+        <Link
+          href="/admin/games"
+          className="p-2 text-gray-400 hover:text-white hover:bg-[#1c2128] rounded-lg transition-all"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Link>
+        <div>
+          <h1 className="text-3xl font-bold text-white">Edit Game</h1>
+          <p className="text-gray-400">Update game information</p>
+        </div>
+      </div>
+
+      {error && (
+        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-lg text-red-400">
+          {error}
+        </div>
+      )}
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-[#151922] border border-[#2d333b] rounded-xl p-6">
+          <h2 className="text-xl font-bold text-white mb-4">Basic Information</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Title <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                name="title"
+                required
+                defaultValue={game.title}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Slug <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                name="slug"
+                required
+                defaultValue={game.slug}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Short Description <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                name="shortDescription"
+                required
+                maxLength={200}
+                defaultValue={game.shortDescription}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Full Description <span className="text-red-400">*</span>
+              </label>
+              <textarea
+                name="description"
+                required
+                rows={6}
+                defaultValue={game.description}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Category <span className="text-red-400">*</span>
+              </label>
+              <select
+                name="category"
+                required
+                defaultValue={game.category}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              >
+                <option value="ACTION">Action</option>
+                <option value="ADVENTURE">Adventure</option>
+                <option value="RPG">RPG</option>
+                <option value="STRATEGY">Strategy</option>
+                <option value="SIMULATION">Simulation</option>
+                <option value="SPORTS">Sports</option>
+                <option value="RACING">Racing</option>
+                <option value="SHOOTER">Shooter</option>
+                <option value="PUZZLE">Puzzle</option>
+                <option value="HORROR">Horror</option>
+                <option value="FIGHTING">Fighting</option>
+                <option value="PLATFORMER">Platformer</option>
+                <option value="MMO">MMO</option>
+                <option value="CASUAL">Casual</option>
+                <option value="INDIE">Indie</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Status <span className="text-red-400">*</span>
+              </label>
+              <select
+                name="status"
+                defaultValue={game.status}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              >
+                <option value="ACTIVE">Active</option>
+                <option value="INACTIVE">Inactive</option>
+                <option value="COMING_SOON">Coming Soon</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Developer <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                name="developer"
+                required
+                defaultValue={game.developer}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Publisher <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                name="publisher"
+                required
+                defaultValue={game.publisher}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Release Date <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="date"
+                name="releaseDate"
+                required
+                defaultValue={new Date(game.releaseDate).toISOString().split('T')[0]}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Price (USD) <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="number"
+                name="price"
+                required
+                min="0"
+                step="0.01"
+                defaultValue={game.price}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Discount (%)
+              </label>
+              <input
+                type="number"
+                name="discount"
+                min="0"
+                max="100"
+                defaultValue={game.discount}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-400">
+                <input
+                  type="checkbox"
+                  name="isFeatured"
+                  defaultChecked={game.isFeatured}
+                  className="w-4 h-4 rounded bg-[#1c2128] border-[#2d333b] text-[#ff6b35] focus:ring-[#ff6b35] focus:ring-offset-0"
+                />
+                Featured Game
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Media */}
+        <div className="bg-[#151922] border border-[#2d333b] rounded-xl p-6">
+          <h2 className="text-xl font-bold text-white mb-4">Media</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Thumbnail URL <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="url"
+                name="thumbnail"
+                required
+                defaultValue={game.thumbnail}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Cover Image URL <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="url"
+                name="coverImage"
+                required
+                defaultValue={game.coverImage}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Video URL (YouTube/Trailer)
+              </label>
+              <input
+                type="url"
+                name="videoUrl"
+                defaultValue={game.videoUrl}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Screenshots (one URL per line)
+              </label>
+              <textarea
+                name="screenshots"
+                rows={4}
+                defaultValue={game.screenshots.join('\n')}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* System Requirements */}
+        <div className="bg-[#151922] border border-[#2d333b] rounded-xl p-6">
+          <h2 className="text-xl font-bold text-white mb-4">System Requirements</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Operating System <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                name="os"
+                required
+                defaultValue={game.systemRequirements.os}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Processor <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                name="processor"
+                required
+                defaultValue={game.systemRequirements.processor}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Memory (RAM) <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                name="memory"
+                required
+                defaultValue={game.systemRequirements.memory}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Graphics <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                name="graphics"
+                required
+                defaultValue={game.systemRequirements.graphics}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Storage <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                name="storage"
+                required
+                defaultValue={game.systemRequirements.storage}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Info */}
+        <div className="bg-[#151922] border border-[#2d333b] rounded-xl p-6">
+          <h2 className="text-xl font-bold text-white mb-4">Additional Information</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Tags (comma-separated)
+              </label>
+              <input
+                type="text"
+                name="tags"
+                defaultValue={game.tags.join(', ')}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Features (one per line)
+              </label>
+              <textarea
+                name="features"
+                rows={4}
+                defaultValue={game.features.join('\n')}
+                className="w-full px-4 py-2 bg-[#1c2128] border border-[#2d333b] rounded-lg text-white focus:outline-none focus:border-[#ff6b35] transition-colors"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-4">
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#ff6b35] to-[#f7931e] text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-[#ff6b35]/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Save className="w-5 h-5" />
+            {loading ? 'Updating...' : 'Update Game'}
+          </button>
+          <Link
+            href="/admin/games"
+            className="flex items-center gap-2 px-6 py-3 bg-[#1c2128] text-white font-semibold rounded-lg hover:bg-[#2d333b] transition-all"
+          >
+            <X className="w-5 h-5" />
+            Cancel
+          </Link>
+        </div>
+      </form>
+    </div>
+  )
+}

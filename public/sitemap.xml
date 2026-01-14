@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- Homepage -->
+  <url>
+    <loc>https://2game.space/</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://2game.space/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="vi-VN" href="https://2game.space/?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://2game.space/?lang=cn"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://2game.space/"/>
+  </url>
+
+  <!-- Community -->
+  <url>
+    <loc>https://2game.space/community</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://2game.space/community?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="vi-VN" href="https://2game.space/community?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://2game.space/community?lang=cn"/>
+  </url>
+
+  <!-- Discover -->
+  <url>
+    <loc>https://2game.space/discover</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://2game.space/discover?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="vi-VN" href="https://2game.space/discover?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://2game.space/discover?lang=cn"/>
+  </url>
+
+  <!-- Cloud Gaming -->
+  <url>
+    <loc>https://2game.space/cloud</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://2game.space/cloud?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="vi-VN" href="https://2game.space/cloud?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://2game.space/cloud?lang=cn"/>
+  </url>
+
+  <!-- XTV (Streaming) -->
+  <url>
+    <loc>https://2game.space/xtv</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://2game.space/xtv?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="vi-VN" href="https://2game.space/xtv?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://2game.space/xtv?lang=cn"/>
+  </url>
+
+  <!-- Events -->
+  <url>
+    <loc>https://2game.space/events</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://2game.space/events?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="vi-VN" href="https://2game.space/events?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://2game.space/events?lang=cn"/>
+  </url>
+
+  <!-- Rankings -->
+  <url>
+    <loc>https://2game.space/rankings</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://2game.space/rankings?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="vi-VN" href="https://2game.space/rankings?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://2game.space/rankings?lang=cn"/>
+  </url>
+
+  <!-- Rewards -->
+  <url>
+    <loc>https://2game.space/rewards</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://2game.space/rewards?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="vi-VN" href="https://2game.space/rewards?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://2game.space/rewards?lang=cn"/>
+  </url>
+
+  <!-- Creator -->
+  <url>
+    <loc>https://2game.space/creator</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://2game.space/creator?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="vi-VN" href="https://2game.space/creator?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://2game.space/creator?lang=cn"/>
+  </url>
+
+  <!-- Developer -->
+  <url>
+    <loc>https://2game.space/developer</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://2game.space/developer?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="vi-VN" href="https://2game.space/developer?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://2game.space/developer?lang=cn"/>
+  </url>
+
+  <!-- My Account -->
+  <url>
+    <loc>https://2game.space/my-account</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Wishlist -->
+  <url>
+    <loc>https://2game.space/wishlist</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Profile -->
+  <url>
+    <loc>https://2game.space/profile</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Login -->
+  <url>
+    <loc>https://2game.space/login</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Register -->
+  <url>
+    <loc>https://2game.space/register</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+</urlset>

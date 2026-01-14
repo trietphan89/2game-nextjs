@@ -1,0 +1,23 @@
+[Unit]
+Description=2GAME.VN Next.js Application
+Documentation=https://nextjs.org/docs
+After=network.target
+
+[Service]
+Type=simple
+User=dev
+WorkingDirectory=/home/dev/2game-nextjs
+Environment="NODE_ENV=production"
+Environment="PORT=3000"
+ExecStart=/usr/bin/npm start
+Restart=always
+RestartSec=10
+StandardOutput=append:/home/dev/2game-nextjs/logs/systemd-out.log
+StandardError=append:/home/dev/2game-nextjs/logs/systemd-error.log
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

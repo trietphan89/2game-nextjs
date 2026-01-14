@@ -1,0 +1,155 @@
+/* 2GAME Typography System - Optimized for Mobile & Desktop */
+
+/* ============================================================================
+   HEADINGS - Responsive & Optimized
+   ============================================================================ */
+
+/* Page Titles - Main heading của mỗi trang */
+.heading-page {
+  @apply text-lg font-bold text-[#e8eaed];
+  @apply md:text-xl lg:text-2xl;
+}
+
+/* Section Titles - Tiêu đề sections */
+.heading-section {
+  @apply text-base font-bold text-[#e8eaed];
+  @apply md:text-lg lg:text-xl;
+}
+
+/* Card Titles - Tiêu đề cards, items */
+.heading-card {
+  @apply text-sm font-semibold text-[#e8eaed];
+  @apply md:text-base;
+}
+
+/* Small Headings - Label, badge headings */
+.heading-small {
+  @apply text-xs font-semibold text-[#e8eaed];
+  @apply md:text-sm;
+}
+
+/* ============================================================================
+   BODY TEXT - Readable & Clean
+   ============================================================================ */
+
+/* Primary body text */
+.text-body {
+  @apply text-sm text-[#e8eaed] leading-relaxed;
+  @apply md:text-base;
+}
+
+/* Secondary body text - Descriptions */
+.text-body-secondary {
+  @apply text-xs text-[#9aa0a6] leading-relaxed;
+  @apply md:text-sm;
+}
+
+/* Small text - Meta info, timestamps */
+.text-meta {
+  @apply text-[10px] text-[#9aa0a6];
+  @apply md:text-xs;
+}
+
+/* Caption text - Very small info */
+.text-caption {
+  @apply text-[9px] text-[#6e7681];
+  @apply md:text-[10px];
+}
+
+/* ============================================================================
+   BUTTONS & INTERACTIVE ELEMENTS
+   ============================================================================ */
+
+/* Primary buttons */
+.btn-text-primary {
+  @apply text-xs font-semibold;
+  @apply md:text-sm;
+}
+
+/* Secondary buttons */
+.btn-text-secondary {
+  @apply text-[10px] font-medium;
+  @apply md:text-xs;
+}
+
+/* Tab buttons */
+.tab-text {
+  @apply text-xs font-semibold;
+  @apply md:text-sm lg:text-base;
+}
+
+/* ============================================================================
+   NUMBERS & STATS
+   ============================================================================ */
+
+/* Large numbers - Stats, prices */
+.number-large {
+  @apply text-xl font-bold text-[#ff6b35];
+  @apply md:text-2xl lg:text-3xl;
+}
+
+/* Medium numbers - Secondary stats */
+.number-medium {
+  @apply text-base font-bold text-[#ff6b35];
+  @apply md:text-lg lg:text-xl;
+}
+
+/* Small numbers - Counters, badges */
+.number-small {
+  @apply text-xs font-semibold;
+  @apply md:text-sm;
+}
+
+/* ============================================================================
+   SPACING UTILITIES - Mobile-first
+   ============================================================================ */
+
+/* Section padding - Vertical spacing */
+.section-padding {
+  @apply px-3 py-3;
+  @apply md:px-4 md:py-4;
+  @apply lg:px-6 lg:py-6;
+}
+
+/* Card padding */
+.card-padding {
+  @apply px-3 py-3;
+  @apply md:px-4 md:py-4;
+}
+
+/* Compact padding - Tight spaces */
+.compact-padding {
+  @apply px-2 py-2;
+  @apply md:px-3 md:py-2.5;
+}
+
+/* ============================================================================
+   SPECIAL CASES
+   ============================================================================ */
+
+/* Hero text - Landing sections */
+.hero-title {
+  @apply text-xl font-extrabold;
+  @apply md:text-2xl lg:text-4xl;
+  @apply bg-gradient-to-r from-white to-[#9aa0a6] bg-clip-text text-transparent;
+}
+
+.hero-description {
+  @apply text-sm text-[#9aa0a6] leading-relaxed;
+  @apply md:text-base lg:text-lg;
+}
+
+/* Emphasis text */
+.text-emphasis {
+  @apply text-[#ff6b35] font-semibold;
+}
+
+/* Success text */
+.text-success {
+  @apply text-[#3fb950] font-medium;
+}
+
+/* Error text */
+.text-error {
+  @apply text-red-400 font-medium;
+}

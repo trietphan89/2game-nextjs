@@ -1,0 +1,42 @@
+# 2GAME.SPACE Robots.txt
+# Gaming Social Platform for Vietnamese Gamers
+
+User-agent: *
+Allow: /
+Allow: /*.js
+Allow: /*.css
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.png
+Allow: /*.gif
+Allow: /*.svg
+Allow: /*.webp
+
+# Disallow admin and API routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /check-firebase
+Disallow: /test-firebase
+Disallow: /firebase-status
+
+# Sitemap
+Sitemap: https://2game.space/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Allow popular search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
